@@ -1,0 +1,10 @@
+[project]
+name = "dynxfetch"
+version = "2025.05.27"
+description = "quick, simple, portable system info fetch"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = ["cpuinfo", "psutil"]
+
+[tool.uv.workspace]
+members = ["dynxfetch"]
