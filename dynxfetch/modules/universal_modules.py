@@ -1,14 +1,19 @@
+
+'''
+collection of functions, which return system info,
+which should work on every platform, be it Linux, macOS, Windows or other
+'''
+
 import os
 import platform
-# import winreg
 import subprocess
-import datetime
 import cpuinfo
-import re
 import psutil
+import re
+import datetime
 from contextlib import suppress
 
-def grab_os():
+def grab_pretty_os():
     '''returns OS'''
     return_name : str = ''
     op_sys = platform.uname()
@@ -35,20 +40,6 @@ def grab_processor_name():
         for line in cpu_info.split("\n"):
             if "model name" in line:
                 return re.sub(".*model name.*:", "", line).strip()
-    # windows
-    elif (op_sys == "Windows"):
-        # try accessing through registry
-        # with suppress(Exception):
-        #    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Hardware\Description\System\CentralProcessor\0")
-        #    value = winreg.QueryValueEx(key, "ProcessorNameString")
-        #    winreg.CloseKey(key)
-        #    cpu_name = value[0].strip()
-        #    return cpu_name
-        # wmic may not work in win 11
-        with suppress(Exception):
-            cpu_name = subprocess.check_output(["wmic", "cpu", "get", "name"]).strip()
-            cpu_name = cpu_name.decode('utf-8')
-            return cpu_name.split("\n")[1]
     # should work if all else fails
     else:
         with suppress(Exception):
@@ -56,6 +47,16 @@ def grab_processor_name():
             return f"{cpu['brand_raw']} @ {cpu['hz_actual_friendly']}"
         
     return ""
+
+def grab_desktop_environment():
+    '''returns the desktop environment'''
+    op_sys = platform.uname().system
+    if (op_sys == "Windows"): # hardcoded, unsure how to fetch windows DE otherwise
+        return "Aero"
+    elif (op_sys == "Darwin"): # ditto, someone let me know how to do this better pls
+        return "Aqua"
+    else:
+        return os.environ.get("DESKTOP_SESSION") or os.environ.get("XDG_SESSION_TYPE")
 
 def grab_ram_usage():
     '''returns current RAM usage'''
@@ -79,8 +80,14 @@ def grab_drive_usage():
     return drives_out
 
 def grab_shell():
-    '''returns the shell used'''
-    shell = os.environ.get('SHELL')
+    '''returns the currently running shell'''
+    shell = ""
+    op_sys = platform.system()
+    if (op_sys == "Linux" or op_sys == "Darwin"):
+        shell = os.environ.get("SHELL")
+    elif (op_sys == "Windows"):
+        shell = os.environ.get("COMSPEC")
+        shell = os.path.basename(shell)
 
     return shell
 
@@ -93,37 +100,3 @@ def grab_uptime():
     minutes = int(uptime_time.total_seconds() % 3600) // 60
 
     return f"{hrs} hrs, {minutes} mins"
-
-def desktop_environment():
-    '''returns the desktop environment'''
-    wm = os.environ.get("DESKTOP_SESSION") or os.environ.get("XDG_SESSION_TYPE")
-    return wm
-
-def print_line(component_name : str, data : str):
-    print(f"-[ {component_name}:\t{data}")
-
-def print_lines(component_name : str, data):
-    print(f"-[ {component_name}:", end="")
-    for x in data:
-        print(f"\t{x}")
-
-def main():
-    op_sys = platform.uname().system
-    host_name = platform.node()
-    user_name = os.environ.get('USER', os.environ.get('USERNAME'))
-
-    print("")
-    print(f"\t{user_name}@{host_name}\n")
-    print_line("OS    ", grab_os())
-    print_line("HOST  ", host_name)
-    print_line("UPTIME", grab_uptime())
-    if (op_sys == "Linux"):
-        print_line("DE    ", desktop_environment())
-        print_line("SHELL ", grab_shell())
-    print_line("CPU   ", grab_processor_name())
-    print_line("RAM   ", grab_ram_usage())
-    print_lines("DRIVE ", grab_drive_usage())
-    print("")
-
-if __name__ == "__main__":
-    main()
