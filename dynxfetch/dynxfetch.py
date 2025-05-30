@@ -28,8 +28,10 @@ def main():
     if platform.uname().system == "Windows":
         from modules import windows_modules
         print_line("CPU", windows_modules.processor_name())
+        print_line("GPU", windows_modules.graphics_card())
     else:
         print_line("CPU", universal_modules.processor_name())
+        print_line("GPU", universal_modules.graphics_card())
     print_line("RAM", universal_modules.ram_usage())
     print_lines("DRIVE", universal_modules.drive_usage())
     print("")

@@ -37,19 +37,39 @@ def processor_name() -> str:
 
     # linux
     if op_sys == "Linux":
-        q = "cat /proc/cpuinfo"
-        cpu_info = subprocess.check_output(q, shell = True).strip()
-        cpu_info = cpu_info.decode('utf-8')
-        for line in cpu_info.split("\n"):
-            if "model name" in line:
-                return re.sub(".*model name.*:", "", line).strip()
+        with suppress(Exception):
+            query = "cat /proc/cpuinfo"
+            cpu_info = subprocess.check_output(query, shell = True).strip()
+            cpu_info = cpu_info.decode('utf-8')
+            for line in cpu_info.split("\n"):
+                if "model name" in line:
+                    return re.sub(".*model name.*:", "", line).strip()
     # should work if all else fails
     else:
         with suppress(Exception):
             cpu = cpuinfo.get_cpu_info()
             return f"{cpu['brand_raw']} @ {cpu['hz_actual_friendly']}"
         
-    return ""
+    return "Unknown"
+
+def graphics_card() -> str:
+    """returns the graphics card name."""
+    op_sys = platform.uname().system
+
+    # linux
+    if op_sys == "Linux":
+        with suppress(Exception):
+            # we use lspci to check for a line with the gpu
+            query = "lspci | grep -i 'vga\|3d\|2d"
+            gpu_info = subprocess.check_output(query, shell = True).strip()
+            gpu_info = gpu_info.decode('utf-8')
+            # and some cursed regex to filter the output
+            front_regex = r".+?: " # ex. [00:00.0 ... controller: ]
+            back_regex = r" \(.+" # ex.  [ (rev 00)]
+            gpu_info = re.sub(front_regex, "", gpu_info)
+            return re.sub(back_regex, "", gpu_info)
+    
+    return "Unknown"
 
 def desktop_environment() -> str:
     """returns the desktop environment name."""
