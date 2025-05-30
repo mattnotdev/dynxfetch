@@ -1,20 +1,23 @@
 
-'''
+"""
 collection of functions, which return system info,
 which should work on every platform, be it Linux, macOS, Windows or other
-'''
+"""
 
+import datetime
 import os
 import platform
+import re
 import subprocess
+
 import cpuinfo
 import psutil
-import re
-import datetime
+
 from contextlib import suppress
 
-def grab_pretty_os():
-    '''returns OS'''
+
+def pretty_os() -> str:
+    """returns OS (prettyfied) name."""
     return_name : str = ''
     op_sys = platform.uname()
 
@@ -28,12 +31,12 @@ def grab_pretty_os():
 
     return return_name
 
-def grab_processor_name():
-    '''returns the processor's name'''
+def processor_name() -> str:
+    """returns the processor's name."""
     op_sys = platform.uname().system
 
     # linux
-    if (op_sys == "Linux"):
+    if op_sys == "Linux":
         q = "cat /proc/cpuinfo"
         cpu_info = subprocess.check_output(q, shell = True).strip()
         cpu_info = cpu_info.decode('utf-8')
@@ -48,26 +51,26 @@ def grab_processor_name():
         
     return ""
 
-def grab_desktop_environment():
-    '''returns the desktop environment'''
+def desktop_environment() -> str:
+    """returns the desktop environment name."""
     op_sys = platform.uname().system
-    if (op_sys == "Windows"): # hardcoded, unsure how to fetch windows DE otherwise
+    if op_sys == "Windows": # hardcoded, unsure how to fetch windows DE otherwise
         return "Aero"
-    elif (op_sys == "Darwin"): # ditto, someone let me know how to do this better pls
+    elif op_sys == "Darwin": # ditto, someone let me know how to do this better pls
         return "Aqua"
     else:
         return os.environ.get("DESKTOP_SESSION") or os.environ.get("XDG_SESSION_TYPE")
 
-def grab_ram_usage():
-    '''returns current RAM usage'''
+def ram_usage() -> str:
+    """returns current RAM usage."""
     ram_usage = psutil.virtual_memory()
     ram_used = ram_usage.used / (1024**3)
     ram_total = ram_usage.total / (1024**3)
 
     return f"{ram_used:.2f} GB / {ram_total:.2f} GB"
 
-def grab_drive_usage():
-    '''returns current used drive space'''
+def drive_usage() -> str:
+    """returns current used drive space."""
     drives = psutil.disk_partitions()
 
     drives_out = []
@@ -79,20 +82,20 @@ def grab_drive_usage():
 
     return drives_out
 
-def grab_shell():
-    '''returns the currently running shell'''
+def shell() -> str:
+    """returns the currently running shell's name."""
     shell = ""
     op_sys = platform.system()
-    if (op_sys == "Linux" or op_sys == "Darwin"):
+    if op_sys == "Linux" or op_sys == "Darwin":
         shell = os.environ.get("SHELL")
-    elif (op_sys == "Windows"):
+    elif op_sys == "Windows":
         shell = os.environ.get("COMSPEC")
         shell = os.path.basename(shell)
 
     return shell
 
-def grab_uptime():
-    '''return a pretty uptime of the system'''
+def pc_uptime() -> str:
+    """return a (prettified) uptime of the system."""
     boot_time = psutil.boot_time()
     current_time = datetime.datetime.now()
     uptime_time = current_time - datetime.datetime.fromtimestamp(boot_time)

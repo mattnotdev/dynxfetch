@@ -1,19 +1,22 @@
 
-'''
+"""
 windows specific functions, which would not work on other platforms
-'''
+"""
 
-import winreg
 import platform
-import cpuinfo
 import subprocess
+import winreg
+
+import cpuinfo
+
 from contextlib import suppress
 
-def grab_processor_name():
-    '''returns the processor's name - windows specific'''
+
+def processor_name() -> str:
+    """returns the processor's name - windows specific"""
     op_sys = platform.uname().system
 
-    if (op_sys == "Windows"):
+    if op_sys == "Windows":
         # try accessing through registry
         with suppress(Exception):
            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Hardware\Description\System\CentralProcessor\0")
@@ -31,4 +34,4 @@ def grab_processor_name():
             cpu = cpuinfo.get_cpu_info()
             return f"{cpu['brand_raw']} @ {cpu['hz_actual_friendly']}"
     else:
-        raise Exception("This function is windows specific! Use the universal module in your case.")
+        raise Exception("impressive that it got here... huh, contact the dev please!")
