@@ -60,7 +60,7 @@ def graphics_card() -> str:
     if op_sys == "Linux":
         with suppress(Exception):
             # we use lspci to check for a line with the gpu
-            query = "lspci | grep -i 'vga\|3d\|2d"
+            query = r"lspci | grep -i 'vga\|3d\|2d'"
             gpu_info = subprocess.check_output(query, shell = True).strip()
             gpu_info = gpu_info.decode('utf-8')
             # and some cursed regex to filter the output
