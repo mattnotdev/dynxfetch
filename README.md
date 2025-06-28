@@ -1,1 +1,2 @@
-a quick, simple, portable system info fetch.
+# dynxfetch
+dynxfetch is a quick, simple and portable system info fetcher written in python. the goal was to write a robust program requiring little to none external dependencies. currently, it supports Linux and Windows, with theoretical support of macOS (which, as of yet, hasn't been tested).

@@ -87,7 +87,7 @@ def ram_usage() -> str:
     ram_used = ram_usage.used / (1024**3)
     ram_total = ram_usage.total / (1024**3)
 
-    return f"{ram_used:.2f} GB / {ram_total:.2f} GB"
+    return f"{ram_used:.2f} GB / {ram_total:.2f} GB used"
 
 def drive_usage() -> str:
     """returns current used drive space."""
@@ -98,7 +98,7 @@ def drive_usage() -> str:
         storage_usage = psutil.disk_usage(drive[1])
         storage_used = storage_usage.used / (1024**3)
         storage_total = storage_usage.total / (1024**3)
-        drives_out.append(f"{drive[1]} {storage_used:.2f} GB / {storage_total:.2f} GB")
+        drives_out.append(f"{drive[1]} - {storage_used:.2f} GB / {storage_total:.2f} GB")
 
     return drives_out
 

@@ -18,6 +18,12 @@ def main():
     host_name = platform.node()
     user_name = os.environ.get('USER', os.environ.get('USERNAME'))
 
+    logo = []
+    with open('logo.txt', 'r') as logo_file:
+        for line in logo_file:
+            line = line.rstrip()
+            logo.append(line)
+
     print("")
     print(f"\t{user_name}@{host_name}\n")
     print_line("OS", universal_modules.pretty_os())
